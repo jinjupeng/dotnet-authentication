@@ -24,6 +24,8 @@ namespace Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
+            // Server端作为认证服务器使用
             services.AddAuthentication("OAuth")
                 .AddJwtBearer("OAuth", config =>
                 {

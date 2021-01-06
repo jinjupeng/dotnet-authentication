@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "identityserver4", "identity
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B7E7D4AF-02BC-4B96-A5AB-CB1498481D46}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{425C3862-090B-477A-A580-0D9356611593}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "src\Server\Server.csproj", "{425C3862-090B-477A-A580-0D9356611593}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
