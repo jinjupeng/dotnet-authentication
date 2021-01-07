@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -152,6 +153,103 @@ namespace Server.Controllers
                 return Ok();
             }
             return BadRequest();
+        }
+
+
+        /// <summary>
+        /// 授权并返回授权码
+        /// </summary>
+        /// <param name="response_type"></param>
+        /// <param name="client_id"></param>
+        /// <param name="redirect_uri"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        [Authorize]
+        public async Task<IActionResult> authorize(string response_type, string client_id, string redirect_uri, string state)
+        {
+            // Check if code is correct and if client credentials are correct.
+            if (response_type != "code")
+            {
+                return Redirect(redirect_uri + "?error=unsupported_response_type");
+            }
+
+            if (!clientValidator.Valid(client_id, client_secret))
+            {
+                return Redirect(redirect_uri + "?error=access_denied");
+            }
+
+            // Generate authorization code and save it together with userId and recirect_uri
+            string code = Guid.NewGuid().ToString();
+            string user = User.Claims.First(c => c.Type.equals == ClaimTypes.Name);
+            codeAndUserStorage.Save(code, user);
+            codeAndURIStorage.Save(code, redirect_uri);
+
+            // Return view
+            ViewBag.redirect_uri = redirect_uri;
+            ViewBag.code = authCode;
+            ViewBag.state = state;
+            return View();
+        }
+
+        /// <summary>
+        /// 返回access_token访问令牌
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="grant_type"></param>
+        /// <param name="redirect_uri"></param>
+        /// <param name="client_id"></param>
+        /// <param name="client_secret"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> AccessToken([FromForm] string code, [FromForm] string grant_type, [FromForm] string redirect_uri, [FromForm] string client_id, [FromForm] string client_secret)
+        {
+            // Check if code is correct and if client credentials are correct.
+            if (grant_type != "authorization_code")
+            {
+                return Redirect(redirect_uri + "?error=unsupported_response_type");
+            }
+
+            if (!clientValidator.Valid(client_id, client_secret))
+            {
+                return Redirect(redirect_uri + "?error=access_denied");
+            }
+
+            // Extract the URI and user
+            string previous_uri = codeAndURIStorage.Load(code);
+            string user = codeAndUserStorage.Load(code);
+            codeAndURIStorage.Delete(code);
+            codeAndUserStorage.Delete(code);
+
+            // Check if the new uir is the same as the previous and that the userId was found
+            if (redirect_uri != previous_uri)
+            {
+                return BadRequest("'redirect_uri' was inconsistent.");
+            }
+
+            if (user == null)
+            {
+                return BadRequest("Couldn't find user associated with the given code.");
+            }
+
+            // Creates the signed JWT
+            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenOptions:Key"]));
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user)
+                }),
+                Expires = DateTime.UtcNow.AddYears(2),
+                Issuer = "MyWebsite.com",
+                Audience = "MyWebsite.com",
+                SigningCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var access_token = tokenHandler.WriteToken(token);
+
+            // Returns the 'access_token' and the type in lower case
+            return Ok(new { access_token, token_type = "bearer" });
         }
     }
 }
