@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace IdentityServer
+namespace MvcClient
 {
     public class Startup
     {
@@ -15,28 +15,29 @@ namespace IdentityServer
 
         public IConfiguration Configuration { get; }
 
+        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-
-            /*
-             * IdentityServer是作为授权服务器，比如支持OAuth2等等
-             */
-            var builder = services.AddIdentityServer(options =>
+            services.AddAuthentication(options =>
             {
-                options.Events.RaiseErrorEvents = true;
-                options.Events.RaiseInformationEvents = true;
-                options.Events.RaiseFailureEvents = true;
-                options.Events.RaiseSuccessEvents = true;
+                options.DefaultScheme = "Cookies";//使用Cookies认证
+                options.DefaultChallengeScheme = "oidc";//使用oidc
             })
-                .AddTestUsers(Config.GetTestUsers())
-                .AddInMemoryApiResources(Config.GetApiResources())
-                .AddInMemoryIdentityResources(Config.GetIdentityResources())
-                .AddInMemoryClients(Config.GetClients())
-                .AddInMemoryApiScopes(Config.ApiScopes);
-            builder.AddDeveloperSigningCredential();
+                .AddCookie("Cookies")//配置Cookies认证
+                .AddOpenIdConnect("oidc", options =>
+                {//配置oidc
+                    options.SignInScheme = "Cookies";
+                    options.Authority = "http://localhost:5000";
+                    options.RequireHttpsMetadata = false;
+
+                    options.ClientId = "mvc";
+                    options.ClientSecret = "secret";
+                    options.SaveTokens = true;
+                });
         }
 
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -51,8 +52,8 @@ namespace IdentityServer
 
             app.UseRouting();
 
-            app.UseIdentityServer();
-
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

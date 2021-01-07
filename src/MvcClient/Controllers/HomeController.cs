@@ -1,10 +1,12 @@
-﻿using IdentityServer.Models;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MvcClient.Models;
 using System.Diagnostics;
 
-namespace IdentityServer.Controllers
+namespace MvcClient.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

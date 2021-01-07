@@ -1,4 +1,4 @@
-namespace IdentityServer.Models
+namespace MvcClient.Models
 {
     public class ErrorViewModel
     {
