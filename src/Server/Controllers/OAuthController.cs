@@ -159,13 +159,13 @@ namespace Server.Controllers
         /// <summary>
         /// 授权并返回授权码
         /// </summary>
-        /// <param name="response_type"></param>
-        /// <param name="client_id"></param>
-        /// <param name="redirect_uri"></param>
-        /// <param name="state"></param>
+        /// <param name="response_type">授权类型，必选项authorization flow type </param>
+        /// <param name="client_id">客户端的id，必选项client id</param>
+        /// <param name="redirect_uri">重定向url，可选项</param>
+        /// <param name="state">客户端的当前状态，可以指定任意值，认证服务器会原封不动地返回这个值random string generated to confirm that we are going to back to the same client</param>
         /// <returns></returns>
         [Authorize]
-        public async Task<IActionResult> authorize(string response_type, string client_id, string redirect_uri, string state)
+        public IActionResult Authorize(string response_type, string client_id, string redirect_uri, string state)
         {
             // Check if code is correct and if client credentials are correct.
             if (response_type != "code")
@@ -180,7 +180,7 @@ namespace Server.Controllers
 
             // Generate authorization code and save it together with userId and recirect_uri
             string code = Guid.NewGuid().ToString();
-            string user = User.Claims.First(c => c.Type.equals == ClaimTypes.Name);
+            string user = User.Claims.First(c => c.Type == ClaimTypes.Name).Value;
             codeAndUserStorage.Save(code, user);
             codeAndURIStorage.Save(code, redirect_uri);
 
@@ -201,7 +201,7 @@ namespace Server.Controllers
         /// <param name="client_secret"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> AccessToken([FromForm] string code, [FromForm] string grant_type, [FromForm] string redirect_uri, [FromForm] string client_id, [FromForm] string client_secret)
+        public IActionResult AccessToken([FromForm] string code, [FromForm] string grant_type, [FromForm] string redirect_uri, [FromForm] string client_id, [FromForm] string client_secret)
         {
             // Check if code is correct and if client credentials are correct.
             if (grant_type != "authorization_code")
