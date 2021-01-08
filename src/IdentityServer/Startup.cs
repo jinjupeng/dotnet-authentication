@@ -21,6 +21,9 @@ namespace IdentityServer
 
             /*
              * IdentityServer是作为授权服务器，比如支持OAuth2等等
+             * https://www.cnblogs.com/Jerseyblog/p/13111700.html
+             * HttpContext.SignInAsync 失效（表面解决了问题，未深入到.net core 源码去找问题，记录一下，等有时间翻一下.net core 源码试试能不能找到根本原因）
+             * https://www.bilibili.com/read/cv6015905/.Net Core外部登录中的一个坑：Correlation failed
              */
             var builder = services.AddIdentityServer(options =>
             {
@@ -33,7 +36,7 @@ namespace IdentityServer
                 .AddInMemoryApiResources(Config.GetApiResources())
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 .AddInMemoryClients(Config.GetClients())
-                .AddInMemoryApiScopes(Config.ApiScopes);
+                .AddInMemoryApiScopes(Config.GetApiScopes());
             builder.AddDeveloperSigningCredential();
         }
 
@@ -53,6 +56,7 @@ namespace IdentityServer
 
             app.UseIdentityServer();
 
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

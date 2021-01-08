@@ -85,7 +85,7 @@ namespace IdentityServer.Controllers
                             IsPersistent = true,
                             ExpiresUtc = DateTimeOffset.UtcNow.Add(TimeSpan.FromMinutes(30))
                         };
-
+                        // 也可以用这个 HttpContext.SignInAsync();
                         await AuthenticationManagerExtensions.SignInAsync(HttpContext, isuser, prop);
                     }
                 }

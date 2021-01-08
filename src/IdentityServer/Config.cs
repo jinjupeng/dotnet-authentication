@@ -18,11 +18,14 @@ namespace IdentityServer
             };
         }
 
-        public static IEnumerable<ApiScope> ApiScopes =>
-        new List<ApiScope>
+        public static IEnumerable<ApiScope> GetApiScopes()
         {
-            new ApiScope("api1", "My API")
-        };
+            return new List<ApiScope>
+            {
+                new ApiScope("api1", "My API")
+            };
+        }
+
 
         /// <summary>
         /// 哪些客户端 Client（应用） 可以使用这个 Authorization Server
