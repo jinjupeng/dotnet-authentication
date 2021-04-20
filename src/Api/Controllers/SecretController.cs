@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Server.Controllers
+namespace Api.Controllers
 {
     public class SecretController : Controller
     {

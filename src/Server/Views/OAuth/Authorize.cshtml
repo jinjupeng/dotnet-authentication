@@ -1,16 +1,13 @@
 ﻿@model string
 
-@{
-  var url = $"/OAuth/Authorize{Model}";
+@{ 
+    var url = $"/OAuth/Authorize{Model}";
 }
 
 
 @Model
 
-<form action="@url" method="post">
-  <input type="text" name="username" value="" />
-  <input type="submit" value="Submit" />
-</form>
-
-<h2>Do you want to give the application that you were redirected from access to your account?</h2>
-<a href="@ViewBag.redirect_uri?code=@ViewBag.code&state=@ViewBag.state">Authorize</a>
+    <form action="@url" method="post">
+        <input type="text" name="username" value="" />
+        <input type="submit" value="Submit" />
+    </form>
