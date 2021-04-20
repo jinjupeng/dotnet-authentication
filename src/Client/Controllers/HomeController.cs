@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace Client.Controllers
 {
+    /// <summary>
+    /// 客户端，向服务端请求授权
+    /// </summary>
     public class HomeController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -36,6 +39,11 @@ namespace Client.Controllers
             return View();
         }
 
+        /// <summary>
+        /// 发送get请求
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
         private async Task<HttpResponseMessage> SecuredGetRequest(string url)
         {
             var token = await HttpContext.GetTokenAsync("access_token");
@@ -58,6 +66,10 @@ namespace Client.Controllers
             return response;
         }
 
+        /// <summary>
+        /// 刷新token
+        /// </summary>
+        /// <returns></returns>
         private async Task RefreshAccessToken()
         {
             var refreshToken = await HttpContext.GetTokenAsync("refresh_token");

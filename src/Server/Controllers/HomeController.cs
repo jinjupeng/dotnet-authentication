@@ -21,7 +21,11 @@ namespace Server.Controllers
             return View();
         }
 
-        public IActionResult Authenticate()
+        /// <summary>
+        /// oauth认证接口
+        /// </summary>
+        /// <returns>返回access_token</returns>
+        public IActionResult Authenticate(/*应该是需要一些参数的*/)
         {
             var claims = new[]
             {
@@ -29,10 +33,12 @@ namespace Server.Controllers
                 new Claim("granny", "cookie")
             };
 
+            // appSecret
             var secretBytes = Encoding.UTF8.GetBytes(Constants.Secret);
             var key = new SymmetricSecurityKey(secretBytes);
             var algorithm = SecurityAlgorithms.HmacSha256;
 
+            // 签名认证
             var signingCredentials = new SigningCredentials(key, algorithm);
 
             var token = new JwtSecurityToken(
@@ -40,14 +46,19 @@ namespace Server.Controllers
                 Constants.Audiance,
                 claims,
                 notBefore: DateTime.Now,
-                expires: DateTime.Now.AddHours(1),
+                expires: DateTime.Now.AddHours(1), // 过期时间1个小时
                 signingCredentials);
 
             var tokenJson = new JwtSecurityTokenHandler().WriteToken(token);
-
+            // 返回access_token
             return Ok(new { access_token = tokenJson });
         }
 
+        /// <summary>
+        /// base64解码
+        /// </summary>
+        /// <param name="part"></param>
+        /// <returns></returns>
         public IActionResult Decode(string part)
         {
             var bytes = Convert.FromBase64String(part);
