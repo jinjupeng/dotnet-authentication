@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using OAuth2.Extension;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -107,6 +108,38 @@ namespace Client.Controllers
             authInfo.Properties.UpdateTokenValue("refresh_token", newRefreshToken);
 
             await HttpContext.SignInAsync("ClientCookie", authInfo.Principal, authInfo.Properties);
+        }
+
+
+        /// <summary>
+        /// Create the Redirect
+        /// This will give you a URI you can just forward the user too. They will sign in and give the app access, which will redirect back to: https://awesome-domain.com/my-awesome-oauth-callback?code=XXX
+        /// </summary>
+        private void CreateRedirect()
+        {
+            var systemRedirectUri = OAuth2.Extension.OAuth2.CreateRedirect(
+                new OAuth2Provider
+                {
+                    ClientId = "my-client-id",
+                    ClientSecret = "my-client-secret",
+                    Scope = "email",
+                    AuthUri = "https://graph.facebook.com/oauth/authorize",
+                    AccessTokenUri = "https://graph.facebook.com/oauth/access_token",
+                    UserInfoUri = "https://graph.facebook.com/me"
+                },
+                "https://awesome-domain.com/my-awesome-oauth-callback");
+        }
+
+        /// <summary>
+        /// Authenticate by Code
+        /// The library will make a web request to the provider with the auth code given and, hopefully, return with a valid access token. You are now authorized with the given provider.
+        /// </summary>
+        private void AuthenticateByCode()
+        {
+            var response = OAuth2.Extension.OAuth2.AuthenticateByCode(
+                new OAuth2Provider { /*...*/ },
+                "same redirect uri as before",
+                "code from callback from provider");
         }
     }
 }

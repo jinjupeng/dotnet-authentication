@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Others", "Others", "{EC4230
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub", "GitHub\GitHub.csproj", "{09016850-BEAA-4239-9D23-7E1DDD6A58E6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OAuth2.Extension", "OAuth2.Extension\OAuth2.Extension.csproj", "{AFF1EF05-8D46-4B31-B540-4967B9E36DBD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{09016850-BEAA-4239-9D23-7E1DDD6A58E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09016850-BEAA-4239-9D23-7E1DDD6A58E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09016850-BEAA-4239-9D23-7E1DDD6A58E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFF1EF05-8D46-4B31-B540-4967B9E36DBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFF1EF05-8D46-4B31-B540-4967B9E36DBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFF1EF05-8D46-4B31-B540-4967B9E36DBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFF1EF05-8D46-4B31-B540-4967B9E36DBD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,6 +73,7 @@ Global
 		{75EAE37D-2868-49AD-B2FE-300A0352FB1C} = {3E3F380D-0DD4-4925-885C-1E52FE571719}
 		{EC4230FE-3C40-4EF1-82AC-71DCEA6918C1} = {B7E7D4AF-02BC-4B96-A5AB-CB1498481D46}
 		{09016850-BEAA-4239-9D23-7E1DDD6A58E6} = {EC4230FE-3C40-4EF1-82AC-71DCEA6918C1}
+		{AFF1EF05-8D46-4B31-B540-4967B9E36DBD} = {3E3F380D-0DD4-4925-885C-1E52FE571719}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FF233F25-C8AE-4367-B96F-067F7F75D63D}
