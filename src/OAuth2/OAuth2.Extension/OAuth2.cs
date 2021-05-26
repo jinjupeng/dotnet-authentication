@@ -264,9 +264,6 @@ namespace OAuth2.Extension
 
         #endregion
     }
-
-
-
 }
 
 

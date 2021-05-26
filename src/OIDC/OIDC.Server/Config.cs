@@ -7,13 +7,10 @@ using System.Security.Claims;
 
 namespace OIDC.Server
 {
-    /// <summary>
-    /// 1、Identity测试使用
-    /// </summary>
     public class Config
     {
         /// <summary>
-        /// 1、微服务API资源
+        /// 这个 Authorization Server 保护了哪些 API （资源）
         /// </summary>
         /// <returns></returns>
         public static IEnumerable<ApiResource> GetApiResources()
@@ -24,6 +21,10 @@ namespace OIDC.Server
             };
         }
 
+        /// <summary>
+        /// 定义系统中的资源
+        /// </summary>
+        /// <returns></returns>
         public static IEnumerable<IdentityResource> GetIdentityResources()
         {
             return new List<IdentityResource>
@@ -35,7 +36,7 @@ namespace OIDC.Server
         }
 
         /// <summary>
-        /// 2、客户端
+        /// 哪些客户端 Client（应用） 可以使用这个 Authorization Server
         /// </summary>
         /// <returns></returns>
         public static IEnumerable<Client> GetClients()
@@ -51,26 +52,38 @@ namespace OIDC.Server
                     PostLogoutRedirectUris = { "https://localhost:5009/signout-oauth" },
 
                     ClientSecrets = { new Secret("secret".Sha256()) },
-
+                    RequirePkce = true, // 开启pkce模式校验，默认为true
                     AllowedGrantTypes = GrantTypes.Code,
-                    AllowedScopes = { "openid", "profile", "email", "api" },
+                    AllowedScopes =
+                    {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        IdentityServerConstants.StandardScopes.Email,
+                        "api"
+                    },
                     AllowOfflineAccess = true
                 },
                 new Client // oidc混合模式
                 {
                     ClientId = "oidc.hybrid",
                     ClientName = "Server-based Client (Hybrid)",
-                    RequirePkce = true,
-                    AllowedGrantTypes = GrantTypes.HybridAndClientCredentials,
+                    RequirePkce = false, // 默认开启pkce校验，注意：混合模式必须关闭pkce的验证,否则会报错 code challenge required
+                    AllowedGrantTypes = GrantTypes.Hybrid,
                     RedirectUris = { "https://localhost:5002/signin-oidc" }, // 登录成功后返回的客户端地址
                     FrontChannelLogoutUri = "https://localhost:5002/signout-oidc", // 客户端注销的返回地址
                     PostLogoutRedirectUris = { "https://localhost:5002/signout-callback-oidc" }, // 认证中心注销登录后客户端返回的地址
-
+                    //RequireClientSecret = false,
                     ClientSecrets = { new Secret("secret".Sha256()) },
                     RequireConsent = true,// 如果不需要显示否同意授权 页面 这里就设置为false
-                    AllowedScopes = { "openid", "profile", "email", "api" },
-                    AllowOfflineAccess = true,
-                    AllowAccessTokensViaBrowser = true
+                    AllowedScopes =
+                    {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        IdentityServerConstants.StandardScopes.Email,
+                        "api"
+                    },
+                    AllowOfflineAccess = true, // 通过刷新令牌的方式来实现长期的API访问
+                    //AllowAccessTokensViaBrowser = true // 通过浏览器传输access token，一般不建议；建议只在后端服务器与认证中心服务器之间传入access_token
                 },
                 // OpenID Connect隐式流客户端（MVC）
                 new Client
@@ -78,7 +91,7 @@ namespace OIDC.Server
                     ClientId = "oidc.implicit",
                     ClientName = "Server-based Client (Implicit)",
                     AllowedGrantTypes = GrantTypes.Implicit,//隐式方式
-                    RequireConsent = false,//如果不需要显示否同意授权 页面 这里就设置为false
+                    RequireConsent = true,//如果不需要显示否同意授权 页面 这里就设置为false
                     RedirectUris = { "https://localhost:5002/signin-oidc" },//登录成功后返回的客户端地址
                     FrontChannelLogoutUri = "https://localhost:5002/signout-oidc", // 客户端注销的返回地址
                     PostLogoutRedirectUris = { "https://localhost:5002/signout-callback-oidc" },//注销登录后返回的客户端地址
@@ -92,7 +105,7 @@ namespace OIDC.Server
             };
         }
         ///// <summary>
-        ///// 客户端下面的用户
+        ///// 指定可以使用 Authorization Server 授权的 Users（用户）
         ///// </summary>
         ///// <returns></returns>
         //public static List<TestUser> GetUsers()

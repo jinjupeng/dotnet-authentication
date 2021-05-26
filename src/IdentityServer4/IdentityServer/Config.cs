@@ -13,7 +13,8 @@ namespace IdentityServer
         /// <returns></returns>
         public static IEnumerable<ApiResource> GetApiResources()
         {
-            return new List<ApiResource>() {
+            return new List<ApiResource>() 
+            {
                 new ApiResource("api1", "My API")
             };
         }
@@ -41,18 +42,22 @@ namespace IdentityServer
             {
                 new Client()
                 {
-                    ClientId="mvc",
-                    AllowedGrantTypes= GrantTypes.Implicit,//模式：最简单的模式
-                    ClientSecrets={//私钥
+                    ClientId = "mvc",
+                    AllowedGrantTypes = GrantTypes.Implicit,// 模式：最简单的模式
+                    ClientSecrets=
+                    {
+                        // 私钥
                         new Secret("secret".Sha256())
                     },
-                    AllowedScopes={//可以访问的Resource
+                    AllowedScopes =
+                    {
+                        //可以访问的Resource
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.OpenId,
                     },
-                    RedirectUris={"http://localhost:5001/signin-oidc"},//跳转登录到的客户端的地址
-                    PostLogoutRedirectUris={"http://localhost:5001/signout-callback-oidc"},//跳转登出到的客户端的地址
-                    RequireConsent=false//是否需要用户点击确认进行跳转
+                    RedirectUris = {"http://localhost:5001/signin-oidc"},// 跳转登录到的客户端的地址
+                    PostLogoutRedirectUris = {"http://localhost:5001/signout-callback-oidc"},// 跳转登出到的客户端的地址
+                    RequireConsent = true // 是否需要用户点击确认进行跳转
                 }
             };
         }
@@ -64,8 +69,10 @@ namespace IdentityServer
         /// <returns></returns>
         public static List<TestUser> GetTestUsers()
         {
-            return new List<TestUser>{
-                new TestUser{
+            return new List<TestUser>
+            {
+                new TestUser
+                {
                     SubjectId="10000",
                     Username="username",
                     Password="password"

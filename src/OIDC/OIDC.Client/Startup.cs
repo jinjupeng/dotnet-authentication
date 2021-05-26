@@ -31,7 +31,6 @@ namespace OIDC.Server
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<CookiePolicyOptions>(options =>
@@ -43,12 +42,13 @@ namespace OIDC.Server
 
             services.AddAuthentication(options =>
             {
+                // 使用Cookies认证
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultSignOutScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                // 使用oidc
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
             })
-            .AddCookie(o =>
+            .AddCookie(o => // 配置Cookies认证
             {
                 o.Events.OnRedirectToAccessDenied = context =>
                 {
@@ -56,19 +56,19 @@ namespace OIDC.Server
                     return Task.CompletedTask;
                 };
             })
-            .AddOpenIdConnect(o =>
+            .AddOpenIdConnect(o => // 配置oidc，混合模式，推荐
             {
-                o.ClientId = "oidc.implicit";
+                o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                o.ClientId = "oidc.hybrid";
                 o.ClientSecret = "secret";
-
                 // 若不设置Authority，就必须指定MetadataAddress
                 o.Authority = "https://localhost:5001/";
                 // 默认为Authority+".well-known/openid-configuration"
                 o.MetadataAddress = "https://localhost:5001/.well-known/openid-configuration";
                 //o.RequireHttpsMetadata = false;
 
-                // 使用混合流
-                o.ResponseType = OpenIdConnectResponseType.IdToken;
+                // 使用混合流，区别于oauth2授权请求的一点，必须包含有id_token这一项。
+                o.ResponseType = OpenIdConnectResponseType.CodeIdToken;
                 // 是否将Tokens保存到AuthenticationProperties中
                 o.SaveTokens = true;
                 // 是否从UserInfoEndpoint获取Claims
@@ -82,7 +82,7 @@ namespace OIDC.Server
                 //o.CallbackPath = new PathString("/signin-oidc");
                 //o.SignedOutCallbackPath = new PathString("/signout-callback-oidc");
                 //o.RemoteSignOutPath = new PathString("/signout-oidc");
-                //o.Scope.Add("openid");
+                //o.Scope.Add("openid"); // 区别于oauth2授权请求的一点，必须包含有openid这一项
                 //o.Scope.Add("profile");
                 //o.ResponseMode = OpenIdConnectResponseMode.FormPost; 
 
@@ -110,6 +110,21 @@ namespace OIDC.Server
                 // OIDC服务器退出后，客户端重定向时触发
                 //o.Events.OnSignedOutCallbackRedirect = context => Task.CompletedTask;
             });
+            //.AddOpenIdConnect(o => // 配置oidc，隐式模式，不推荐
+            //{
+            //    o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //    o.ClientId = "oidc.implicit";
+            //    o.Authority = "https://localhost:5001/";
+            //    o.MetadataAddress = "https://localhost:5001/.well-known/openid-configuration";
+            //    //o.RequireHttpsMetadata = false;
+            //    o.ResponseType = OpenIdConnectResponseType.IdToken;
+            //    o.SaveTokens = true;
+            //    o.GetClaimsFromUserInfoEndpoint = true;
+            //    o.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        NameClaimType = "name"
+            //    };
+            //});
         }
 
         /// <summary>
@@ -151,7 +166,7 @@ namespace OIDC.Server
                 });
             });
 
-            // 远程退出，同时oidc也会退出，oidc退出后，回调到本地应用，并推出
+            // 远程退出，即oidc先退出，oidc退出后，回调到本地应用退出页面后，本地应用再退出
             app.Map("/signout_remote", builder =>
             {
                 builder.Run(async context =>

@@ -21,12 +21,12 @@ namespace MvcClient
             services.AddControllersWithViews();
             services.AddAuthentication(options =>
             {
-                options.DefaultScheme = "Cookies";//使用Cookies认证
-                options.DefaultChallengeScheme = "oidc";//使用oidc
+                options.DefaultScheme = "Cookies"; //使用Cookies认证
+                options.DefaultChallengeScheme = "oidc"; //使用oidc
             })
-                .AddCookie("Cookies")//配置Cookies认证
-                .AddOpenIdConnect("oidc", options =>
-                {//配置oidc
+                .AddCookie("Cookies")// 配置Cookies认证
+                .AddOpenIdConnect("oidc", options => //配置oidc
+                {
                     options.SignInScheme = "Cookies";
                     options.Authority = "http://localhost:5000";
                     options.RequireHttpsMetadata = false;
