@@ -1,5 +1,3 @@
-using System;
-
 namespace SSO.Server.Models
 {
     public class ErrorViewModel
