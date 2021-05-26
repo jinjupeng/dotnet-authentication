@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -153,5 +155,110 @@ namespace Server.Controllers
             return BadRequest();
         }
 
+        /*
+         * https://juejin.cn/post/6847009773477429255
+         * OAuth2.0 授权过程中几个重要的参数:
+         * 1、response_type：code 表示要求返回授权码，token 表示直接返回令牌
+         * 2、client_id：客户端身份标识
+         * 3、client_secret：客户端密钥
+         * 4、redirect_uri：重定向地址
+         * 5、scope：表示授权的范围，read只读权限，all读写权限
+         * 6、grant_type：表示授权的方式，AUTHORIZATION_CODE（授权码）、password（密码）、client_credentials（凭证式）、refresh_token 更新令牌
+         * 7、state：应用程序传递的一个随机数，用来防止CSRF攻击
+         */
+
+        /// <summary>
+        /// 用于颁发客户端凭据 （客户端 ID 和客户端密钥）
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Credentials ")]
+        public async Task<IActionResult> Credentials()
+        {
+            var clientId = Guid.NewGuid().ToString("N");
+            var clientSecret = Guid.NewGuid().ToString("N");
+            var json = new
+            {
+                CLIENT_ID = clientId,
+                CLIENT_SECRET = clientSecret
+            };
+            return Ok(await Task.FromResult(json));
+        }
+
+        /// <summary>
+        /// 使用客户端凭据颁发令牌
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("Token ")]
+        public async Task<IActionResult> Token()
+        {
+            // 获取clientId、clientSecret
+            return Ok(await Task.FromResult(""));
+        }
+
+        #region 授权码模式（authorization-code）
+
+        [HttpGet]
+        public IActionResult Authorize(string client_id,
+            string redirect_uri, string scope)
+        {
+            var client = GetClients().Any(a => a.client_id == client_id);
+            if (!client)
+            {
+                Console.WriteLine($"Unknown client{client_id}");
+                return View("error"); // 返回到错误页面
+            }
+
+        }
+
+        #endregion
+
+        #region 隐式授权模式（implicit）
+
+        #endregion
+
+        #region 客户端验证模式（client credentials）
+
+        #endregion
+
+        #region 密码模式（password）
+
+        #endregion
+
+        /// <summary>
+        /// 客户端集合
+        /// </summary>
+        /// <returns></returns>
+        private List<Client> GetClients()
+        {
+            var clients = new List<Client> {
+                new Client
+                {
+                     client_id = "oauth-client-1",
+                     client_secret = "oauth-client-secret-1",
+                     redirect_uris = new string[] { "http://localhost:9000/callback" },
+                     scope = "foo bar",
+                     logo_uri = "https://images.manning.com/720/960/resize/book/e/14336f9-6493-46dc-938c-11a34c9d20ac/Richer-OAuth2-HI.png",
+                     client_name = "OAuth in Action Exercise Client"
+                },
+                new Client
+                {
+                     client_id = "oauth-client-2",
+                     client_secret = "oauth-client-secret-1",
+                     redirect_uris = new string[] { "http://localhost:9000/callback" },
+                     scope = "bar"
+                },
+                new Client
+                {
+                     client_id = "native-client-1",
+                     client_secret = "oauth-native-secret-1",
+                     redirect_uris = new string[] { "mynativeapp://" },
+                     scope = "openid profile email phone address",
+                     logo_uri = "https://images.manning.com/720/960/resize/book/e/14336f9-6493-46dc-938c-11a34c9d20ac/Richer-OAuth2-HI.png"
+                },
+            };
+            return clients;
+        }
     }
 }
