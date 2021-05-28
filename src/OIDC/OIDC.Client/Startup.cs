@@ -125,6 +125,22 @@ namespace OIDC.Server
             //        NameClaimType = "name"
             //    };
             //});
+            //.AddOpenIdConnect(o => // ≈‰÷√oidc£¨ ⁄»®¬Îƒ£ Ω
+            //{
+            //    o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //    o.ClientId = "oauth.code";
+            //    o.ClientSecret = "secret";
+            //    o.Authority = "https://localhost:5001/";
+            //    o.MetadataAddress = "https://localhost:5001/.well-known/openid-configuration";
+            //    //o.RequireHttpsMetadata = false;
+            //    o.ResponseType = OpenIdConnectResponseType.Code;
+            //    o.SaveTokens = true;
+            //    o.GetClaimsFromUserInfoEndpoint = true;
+            //    o.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        NameClaimType = "name"
+            //    };
+            //});
         }
 
         /// <summary>
